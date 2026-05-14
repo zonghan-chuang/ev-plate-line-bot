@@ -18,7 +18,8 @@ def fetch_html():
         "User-Agent": "Mozilla/5.0 EV Plate Summary Bot"
     }
     r = requests.get(SOURCE_URL, headers=headers, timeout=30)
-    r.raise_for_status()
+    r.raise_for_status()    
+    r.encoding = "utf-8"
     return r.text
 
 
