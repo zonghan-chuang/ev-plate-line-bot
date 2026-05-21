@@ -54,7 +54,8 @@ def parse_plate_data(html):
             "last": unique_plates[-1],
         })
 
-    result.sort(key=lambda x: x["station"])
+    priority = ["臺中區監理所", "台中市監理站"]
+    result.sort(key=lambda x: (priority.index(x["station"]) if x["station"] in priority else len(priority), x["station"]))
     return update_time, result
 
 
