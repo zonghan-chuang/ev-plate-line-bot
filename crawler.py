@@ -62,8 +62,16 @@ def parse_plate_data(html):
 
 def build_message(update_time, data):
     now = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y/%m/%d %H:%M")
-    if not data:
-        return f"🚗 全台電動自小客車牌摘要\n執行時間：{now}\n\n目前沒有抓到車牌資料。"
+
+    # 過濾：只保留符合條件 1 或條件 2 的單位
+    filtered_data = [
+        item for item in data
+        if ("臺中" in item["station"] or "台中" in item["station"])
+        or item["filtered_count"] > 0
+    ]
+
+    if not filtered_data:
+        return f"🚗 全台電動自小客車牌摘要\n執行時間：{now}\n\n目前沒有符合條件的資料。"
 
     lines = [
         "🚗 全台電動自小客車牌摘要",
@@ -72,10 +80,10 @@ def build_message(update_time, data):
     if update_time:
         lines.append(f"來源更新：{update_time}")
     lines.append("")
-    lines.append(f"共 {len(data)} 個監理站有資料")
+    lines.append(f"共 {len(filtered_data)} 個監理站有資料")
     lines.append("")
 
-    for item in data:
+    for item in filtered_data:
         is_taichung = "臺中" in item["station"] or "台中" in item["station"]
         prefix = "⭐ " if is_taichung else ""
         lines.append(f"【{prefix}{item['station']}】")
@@ -83,12 +91,9 @@ def build_message(update_time, data):
         lines.append(f"第一張：{item['first']}")
         lines.append(f"最後張：{item['last']}")
 
-        # 條件 2：顯示 01/02/03 開頭的車牌
         if item["filtered_plates"]:
             lines.append(f"含 01-03 號段（{item['filtered_count']} 張）：")
             lines.append("  " + "、".join(item["filtered_plates"]))
-        else:
-            lines.append("含 01-03 號段：無")
 
         lines.append("")
 
