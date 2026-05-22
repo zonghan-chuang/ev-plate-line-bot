@@ -98,6 +98,7 @@ def build_message(update_time, data):
         lines.append("")
 
     return "\n".join(lines).strip()
+    
 
 def push_line_message(text):
     url = "https://api.line.me/v2/bot/message/push"
